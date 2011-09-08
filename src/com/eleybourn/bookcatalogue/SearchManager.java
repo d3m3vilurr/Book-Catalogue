@@ -65,7 +65,9 @@ public class SearchManager implements OnTaskEndedListener {
 	private Bundle mAmazonData;
 	// Output from LibraryThing search
 	private Bundle mLibraryThingData;
-
+	// Output from Yes24 search
+	private Bundle mYes24Data;
+	
 	// Handler for search results
 	private SearchResultHandler mSearchHandler = null;
 
@@ -117,6 +119,8 @@ public class SearchManager implements OnTaskEndedListener {
 			return mGoogleHandler;
 		} else if (t instanceof SearchLibraryThingThread){
 			return mLibraryThingHandler;
+		} else if (t instanceof SearchYes24Thread){
+			return mYes24Handler;
 		} else {
 			return null;
 		}
@@ -167,6 +171,14 @@ public class SearchManager implements OnTaskEndedListener {
 			if (mIsbn != null && mIsbn.trim().length() > 0)
 				startOne( new SearchLibraryThingThread(mTaskManager, mLibraryThingHandler, mAuthor, mTitle, mIsbn, mFetchThumbnail));		
 	}
+	/**
+	 * Start an Yes24 search
+	 */
+	private void startYes24(){
+		if (!mCancelledFlg)
+			if (mIsbn != null && mIsbn.trim().length() > 0)
+				startOne( new SearchYes24Thread(mTaskManager, mYes24Handler, mAuthor, mTitle, mIsbn, mFetchThumbnail));		
+	}
 
 	/**
 	 * Start a search
@@ -181,6 +193,7 @@ public class SearchManager implements OnTaskEndedListener {
 		mGoogleData = null;
 		mAmazonData = null;
 		mLibraryThingData = null;
+		mYes24Data = null;
 		mWaitingForIsbn = false;
 		mCancelledFlg = false;
 		mFinished = false;
@@ -213,6 +226,7 @@ public class SearchManager implements OnTaskEndedListener {
 			}
 			startGoogle();
 			startAmazon();
+			startYes24();
 		} else {
 			// Run one at a time, startNext() defined the order.
 			mWaitingForIsbn = true;
@@ -275,6 +289,7 @@ public class SearchManager implements OnTaskEndedListener {
 		accumulateData(mGoogleData);
 		accumulateData(mAmazonData);
 		accumulateData(mLibraryThingData);
+		accumulateData(mYes24Data);
 		
     	// If there are thumbnails present, pick the biggest, delete others and rename.
     	Utils.cleanupThumbnails(mBookData);
@@ -334,6 +349,8 @@ public class SearchManager implements OnTaskEndedListener {
 			startAmazon();
 		} else if (mLibraryThingData == null) {
 			startLibraryThing();
+		} else if (mYes24Data == null) {
+			startYes24();
 		}
 	}
 
@@ -355,6 +372,7 @@ public class SearchManager implements OnTaskEndedListener {
 						mIsbn = bookData.getString(CatalogueDBAdapter.KEY_ISBN);
 						startAmazon();
 						startLibraryThing();
+						startYes24();
 					} else {
 						// Start next one that has not run. 
 						startNext();
@@ -382,6 +400,7 @@ public class SearchManager implements OnTaskEndedListener {
 						mIsbn = bookData.getString(CatalogueDBAdapter.KEY_ISBN);
 						startGoogle();
 						startLibraryThing();
+						startYes24();
 					} else {
 						// Start next one that has not run. 
 						startNext();
@@ -409,6 +428,35 @@ public class SearchManager implements OnTaskEndedListener {
 						mIsbn = bookData.getString(CatalogueDBAdapter.KEY_ISBN);
 						startGoogle();
 						startAmazon();
+						startYes24();
+					} else {
+						// Start next one that has not run. 
+						startNext();
+					}
+				}				
+			}
+		}
+	};
+
+	/**
+	 * Handle Yes24 completion
+	 */
+	private SearchTaskHandler mYes24Handler = new SearchTaskHandler() {
+		@Override
+		public void onSearchThreadFinish(SearchThread t, Bundle bookData, boolean cancelled) {
+			mCancelledFlg = cancelled;
+			mYes24Data = bookData;
+			if (cancelled) {
+				mWaitingForIsbn = false;
+			} else {
+				if (mWaitingForIsbn) {
+					if (Utils.isNonBlankString(bookData, CatalogueDBAdapter.KEY_ISBN)) {
+						mWaitingForIsbn = false;
+						// Start the other two...even if they have run before
+						mIsbn = bookData.getString(CatalogueDBAdapter.KEY_ISBN);
+						startGoogle();
+						startAmazon();
+						startLibraryThing();
 					} else {
 						// Start next one that has not run. 
 						startNext();
