@@ -141,6 +141,7 @@
 <string name="searching_amazon_books">Searching Amazon</string>
 <string name="searching_google_books">Searching Google Books</string>
 <string name="searching_library_thing">Searching LibraryThing</string>
+<string name="searching_aladin_books">Searching Aladin Books</string>
 <string name="bookshelf_title">Select bookshelves for this book</string>
 <string name="bookshelves">Select Bookshelves</string>
 <string name="format">Format</string>
