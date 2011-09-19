@@ -161,7 +161,7 @@ public class SearchAladinBooksEntryHandler {
 		}
 		addIfNotPresent(CatalogueDBAdapter.KEY_DESCRIPTION, parseDescription());
 		String thumbnail = parseThumbnail();
-		String filename = Utils.saveThumbnailFromUrl(thumbnail, "_YES24");
+		String filename = Utils.saveThumbnailFromUrl(thumbnail, "_ALADIN");
 		if (filename.length() > 0) {
 			Utils.appendOrAdd(mValues, "__thumbnail", filename);
 		}
