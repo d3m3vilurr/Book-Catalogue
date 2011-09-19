@@ -1,3 +1,4 @@
+
 package com.eleybourn.bookcatalogue;
 
 import java.io.IOException;
@@ -184,9 +185,12 @@ public class SearchAladinBooksEntryHandler {
 
 	private List<String> parseAuthorDetails() {
 		List<String> list= new ArrayList<String>(1);
-		list.add(mDocument.getElementById("m_product_authorInfo1_txtAuthorInfo")
-				          .text()
-				          .replaceAll(" \\(지은이\\)", ""));
+		String[] authors = mDocument.getElementById("m_product_authorInfo1_txtAuthorInfo")
+				                    .text()
+				                    .split(", ");
+		for(String author : authors) {
+			list.add(author.replaceAll(" \\(지은이\\)", ""));
+		}
 		return list;
 	}
 
