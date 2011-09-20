@@ -365,7 +365,7 @@ public class CatalogueDBAdapter {
 		
 	private final Context mCtx;
 	//TODO: Update database version
-	public static final int DATABASE_VERSION = 60;
+	public static final int DATABASE_VERSION = 61;
 
 	private TableInfo mBooksInfo = null;
 
@@ -1170,6 +1170,16 @@ public class CatalogueDBAdapter {
 					message += "* Optionally restrict 'Sort By Author' to only the first Author (where there are multiple listed)\n\n";
 					message += "* Minor bug fixes\n\n";
 				}
+				if (curVersion == 60) {
+					curVersion++;
+					message += "New in v3.7\n\n";
+					message += "Hint: The export function will create an export.csv file on the sdcard\n\n";
+					message += "* You can crop cover thumbnails (both from the menu and after taking a camera image)\n\n";
+					message += "* You can tweet about a book directly from the book edit screen.\n\n";
+					message += "* Sort by Date Published added\n\n";
+					message += "* Will check for network connection prior to searching for details (new permission required)\n\n";
+					message += "* Fixed crash when opening search results\n\n";
+				}
 			}
 			//TODO: NOTE: END OF UPDATE
 		}
@@ -1891,7 +1901,6 @@ public class CatalogueDBAdapter {
 		if (date == null) {
 			date = META_EMPTY_DATE_PUBLISHED;
 		}
-		Log.e("BC", "Date: " + date);
 		if (date.equals(META_EMPTY_DATE_PUBLISHED)) {
 			where = "(b." + KEY_DATE_PUBLISHED + "='' OR b." + KEY_DATE_PUBLISHED + " IS NULL or cast(strftime('%Y', b." + KEY_DATE_PUBLISHED + ") as int)<0 or cast(strftime('%Y', b." + KEY_DATE_PUBLISHED + ") as int) is null)";
 		} else {
@@ -2021,7 +2030,6 @@ public class CatalogueDBAdapter {
 				+ " Case When (b." + KEY_DATE_PUBLISHED + " = '' or b." + KEY_DATE_PUBLISHED + " is NULL or cast(strftime('%Y', b." + KEY_DATE_PUBLISHED + ") as int)<0 or cast(strftime('%Y', b." + KEY_DATE_PUBLISHED + ") as int) is null) Then '" + META_EMPTY_DATE_PUBLISHED + "'"
 				+ " Else strftime('%Y', b." + KEY_DATE_PUBLISHED + ") End as " + KEY_ROWID + baseSql +
 		" ORDER BY strftime('%Y', b." + KEY_DATE_PUBLISHED + ") " + COLLATION;
-		Log.e("BC", sql);
 		return mDb.rawQuery(sql, new String[]{});
 	}
 	
