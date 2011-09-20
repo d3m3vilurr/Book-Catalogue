@@ -194,7 +194,6 @@ public class BookEdit extends TabActivity {
 				thisBook.moveToFirst();
 				String title = thisBook.getString(thisBook.getColumnIndex(CatalogueDBAdapter.KEY_TITLE));
 				double rating = thisBook.getDouble(thisBook.getColumnIndex(CatalogueDBAdapter.KEY_RATING));
-				Log.e("BC", rating  + " ");
 				String ratingString = "";
 				String author = thisBook.getString(thisBook.getColumnIndex(CatalogueDBAdapter.KEY_AUTHOR_FORMATTED_GIVEN_FIRST));
 				String series = thisBook.getString(thisBook.getColumnIndex(CatalogueDBAdapter.KEY_SERIES_FORMATTED));
@@ -205,7 +204,6 @@ public class BookEdit extends TabActivity {
 				if (rating > 0) {
 					int ratingTmp = (int)rating;
 					double decimal = rating - ratingTmp;
-					Log.e("BC", rating + " " + ratingTmp + " " + decimal);
 					if (decimal > 0) {
 						ratingString = rating + "/5";
 					} else {
