@@ -20,6 +20,8 @@
 
 package com.eleybourn.bookcatalogue;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Message;
 
@@ -119,5 +121,10 @@ abstract public class SearchThread extends ManagedTask {
 		try {s = e.getMessage(); } catch (Exception e2) {s = "Unknown Exception";};
 		String msg = String.format(getString(R.string.search_exception), getString(id), s);
 		doToast(msg);		
+	}
+	
+	protected static boolean isAvailable(Context context, String key) {
+		SharedPreferences prefs = context.getSharedPreferences("bookCatalogue", android.content.Context.MODE_PRIVATE);
+		return SearchSource.getSearchSource(prefs, key);
 	}
 }

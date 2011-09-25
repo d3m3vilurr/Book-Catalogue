@@ -13,7 +13,10 @@ public class SearchAmazonThread extends SearchThread {
 		//	Amazon
 		//
 		this.doProgress(getString(R.string.searching_amazon_books), 0);
-
+		if (!SearchThread.isAvailable(mManager.getAppContext(), "Amazon")) {
+			return;
+		}
+		
 		try {
 			AmazonManager.searchAmazon(mIsbn, mAuthor, mTitle, mBookData, mFetchThumbnail);
 			// Look for series name and clear KEY_TITLE
