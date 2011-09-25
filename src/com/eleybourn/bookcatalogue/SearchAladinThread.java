@@ -10,10 +10,13 @@ public class SearchAladinThread extends SearchThread {
 	@Override
 	protected void onRun() {
 		//
-		//	Amazon
+		//	Aladin
 		//
 		this.doProgress(getString(R.string.searching_aladin_books), 0);
-
+		if (!SearchThread.isAvailable(mManager.getAppContext(), "Aladin")) {
+			return;
+		}
+		
 		try {
 			AladinManager.searchAladin(mIsbn, mAuthor, mTitle, mBookData, mFetchThumbnail);
 			// Look for series name and clear KEY_TITLE

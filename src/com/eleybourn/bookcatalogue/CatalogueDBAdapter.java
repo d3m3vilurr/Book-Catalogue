@@ -1213,7 +1213,7 @@ public class CatalogueDBAdapter {
 		}
 
 		private void insertSearchSources(SQLiteDatabase db) {
-			String[] sources = {"Google", "Amazon", "LibraryThing"};
+			String[] sources = {"Google", "Amazon", "LibraryThing", "Yes24", "Aladin"};
 			for (String source : sources) {
 				db.execSQL("INSERT OR REPLACE INTO " + DB_TB_SEARCH_SOURCE + "( " + KEY_SEARCH_SOURCE + ") VALUES ('" + source + "')");	
 			}

@@ -14,7 +14,10 @@ public class SearchYes24Thread extends SearchThread {
 			//	Yes24
 			//
 			doProgress(getString(R.string.searching_yes24_books), 0);
-
+			if (!SearchThread.isAvailable(mManager.getAppContext(), "Yes24")) {
+				return;
+			}
+			
 			try {
 				Yes24BooksManager.searchYes24(mIsbn, mAuthor, mTitle, mBookData, mFetchThumbnail);					
 			} catch (Exception e) {
