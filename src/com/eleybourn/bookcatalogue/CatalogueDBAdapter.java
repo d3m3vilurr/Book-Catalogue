@@ -103,7 +103,6 @@ public class CatalogueDBAdapter {
 	public static final String KEY_SERIES_NUM_FORMATTED = "series_num_formatted";
 	
 	public static final String KEY_SEARCH_SOURCE = "search_source";
-	public static final String KEY_SEARCH_SOURCE_ENABLED = "search_source_enabled";
 	
 	// We tried 'Collate UNICODE' but it seemed to be case sensitive. We ended
 	// up with 'Ursula Le Guin' and 'Ursula le Guin'.
@@ -251,8 +250,7 @@ public class CatalogueDBAdapter {
 	private static final String DATABASE_CREATE_SEARCH_SOURCE = 
 		"create table " + DB_TB_SEARCH_SOURCE + 
 		" (_id integer primary key autoincrement, " +
-		KEY_SEARCH_SOURCE + " text not null, " +
-		KEY_SEARCH_SOURCE_ENABLED + "boolean not null default 'y'" +
+		KEY_SEARCH_SOURCE + " text not null " +
 		")";
 		
 	private static final String[] DATABASE_CREATE_INDICES = {
@@ -1218,7 +1216,7 @@ public class CatalogueDBAdapter {
 			String[] sources = {"Google", "Amazon", "LibraryThing"};
 			for (String source : sources) {
 				db.execSQL("INSERT OR REPLACE INTO " + DB_TB_SEARCH_SOURCE + "( " + KEY_SEARCH_SOURCE + ") VALUES ('" + source + "')");	
-			}		
+			}
 		}
 	}
 	
