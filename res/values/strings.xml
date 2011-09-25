@@ -109,6 +109,8 @@
 <string name="filler_help_text">Full online application help will come soon. </string>
 <string name="menu_manage_fields">Manage Field Visibility</string>
 <string name="manage_fields_help">Selected fields are visible in the add/edit book screens. Unselected fields are hidden.</string>
+<string name="menu_manage_search_sources">Manage Search Source</string>
+<string name="manage_search_sources_help">Selected sources are search enable in the add book screens. Unselected sources are disable.</string>
 <string name="edit_book_anthology">Anthology Titles</string>
 <string name="amazon_wishlist">Amazon Wishlist</string>
 <string name="same_author">All stories in this anthology are written by the same author</string>

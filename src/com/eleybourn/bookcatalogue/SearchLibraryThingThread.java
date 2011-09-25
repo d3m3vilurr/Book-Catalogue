@@ -20,6 +20,9 @@ public class SearchLibraryThingThread extends SearchThread {
 			String isbn = mIsbn;
 			if (isbn.length() > 0) {
 				this.doProgress(getString(R.string.searching_library_thing), 0);
+				if (!SearchThread.isAvailable(mManager.getAppContext(), "LibraryThing")) {
+					return;
+				}
 				LibraryThingManager ltm = new LibraryThingManager(mManager.getAppContext());
 				if (ltm.isAvailable()) {
 					try {

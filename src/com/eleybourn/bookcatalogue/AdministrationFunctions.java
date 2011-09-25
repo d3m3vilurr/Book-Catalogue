@@ -53,6 +53,7 @@ public class AdministrationFunctions extends ActivityWithTasks {
 	private static final int ACTIVITY_BOOKSHELF=1;
 	private static final int ACTIVITY_FIELD_VISIBILITY=2;
 	private static final int ACTIVITY_UPDATE_FROM_INTERNET=3;
+	private static final int ACTIVITY_SEARCH_SOURCE=4;
 	private CatalogueDBAdapter mDbHelper;
 	//private int importUpdated = 0;
 	//private int importCreated = 0;
@@ -157,6 +158,16 @@ public class AdministrationFunctions extends ActivityWithTasks {
 			}
 		});
 		
+		/* Manage Search Sources Link*/
+		TextView search_sources = (TextView) findViewById(R.id.search_sources_label);
+		search_sources.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				manageSearchSources();
+				return;
+			}
+		});
+		
 		/* Export Link */
 		TextView export = (TextView) findViewById(R.id.export_label);
 		export.setOnClickListener(new OnClickListener() {
@@ -233,6 +244,14 @@ public class AdministrationFunctions extends ActivityWithTasks {
 	private void manageFields() {
 		Intent i = new Intent(this, FieldVisibility.class);
 		startActivityForResult(i, ACTIVITY_FIELD_VISIBILITY);
+	}
+	
+	/**
+	 * Load the Manage Search Source Activity
+	 */
+	private void manageSearchSources() {
+		Intent i = new Intent(this, SearchSource.class);
+		startActivityForResult(i, ACTIVITY_SEARCH_SOURCE);
 	}
 	
 	/**

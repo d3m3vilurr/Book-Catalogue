@@ -14,7 +14,10 @@ public class SearchGoogleThread extends SearchThread {
 			//	Google
 			//
 			doProgress(getString(R.string.searching_google_books), 0);
-
+			if (!SearchThread.isAvailable(mManager.getAppContext(), "Google")) {
+				return;
+			}
+			
 			try {
 				GoogleBooksManager.searchGoogle(mIsbn, mAuthor, mTitle, mBookData, mFetchThumbnail);					
 			} catch (Exception e) {
