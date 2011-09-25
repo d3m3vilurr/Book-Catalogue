@@ -447,6 +447,7 @@ public class SearchManager implements OnTaskEndedListener {
 						startGoogle();
 						startAmazon();
 						startYes24();
+						startAladin();
 					} else {
 						// Start next one that has not run. 
 						startNext();
@@ -504,6 +505,7 @@ public class SearchManager implements OnTaskEndedListener {
 						startGoogle();
 						startAmazon();
 						startLibraryThing();
+						startYes24();
 					} else {
 						// Start next one that has not run. 
 						startNext();
@@ -512,4 +514,5 @@ public class SearchManager implements OnTaskEndedListener {
 			}
 		}
 	};
+	
 }
