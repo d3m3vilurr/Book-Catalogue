@@ -102,8 +102,6 @@ public class CatalogueDBAdapter {
 	public static final String KEY_SERIES_FORMATTED = "series_formatted";
 	public static final String KEY_SERIES_NUM_FORMATTED = "series_num_formatted";
 	
-	public static final String KEY_SEARCH_SOURCE = "search_source";
-	
 	// We tried 'Collate UNICODE' but it seemed to be case sensitive. We ended
 	// up with 'Ursula Le Guin' and 'Ursula le Guin'.
 	//public static final String COLLATION = "Collate NOCASE";
@@ -122,7 +120,6 @@ public class CatalogueDBAdapter {
 	private static final String DB_TB_BOOKSHELF = "bookshelf";
 	private static final String DB_TB_LOAN = "loan";
 	private static final String DB_TB_SERIES = "series";
-	private static final String DB_TB_SEARCH_SOURCE = "search_source";
 	public static String message = "";
 	public static String do_action = "";
 	public static String DO_UPDATE_FIELDS = "do_update_fields";
@@ -247,12 +244,6 @@ public class CatalogueDBAdapter {
 		"PRIMARY KEY(" + KEY_BOOK + ", "  + KEY_AUTHOR_POSITION + ")" +
 		")";
 	
-	private static final String DATABASE_CREATE_SEARCH_SOURCE = 
-		"create table " + DB_TB_SEARCH_SOURCE + 
-		" (_id integer primary key autoincrement, " +
-		KEY_SEARCH_SOURCE + " text not null " +
-		")";
-		
 	private static final String[] DATABASE_CREATE_INDICES = {
 		"CREATE INDEX IF NOT EXISTS authors_given_names ON "+DB_TB_AUTHORS+" ("+KEY_GIVEN_NAMES+");", 
 		"CREATE INDEX IF NOT EXISTS authors_given_names_ci ON "+DB_TB_AUTHORS+" ("+KEY_GIVEN_NAMES+" " + COLLATION + ");", 
@@ -277,8 +268,7 @@ public class CatalogueDBAdapter {
 		"CREATE UNIQUE INDEX IF NOT EXISTS book_series_book ON "+DB_TB_BOOK_SERIES+" ("+KEY_BOOK+", " + KEY_SERIES_ID + ", " + KEY_SERIES_NUM + ");",
 		"CREATE UNIQUE INDEX IF NOT EXISTS book_author_author ON "+DB_TB_BOOK_AUTHOR+" ("+KEY_AUTHOR_ID+", " + KEY_BOOK + ");",
 		"CREATE UNIQUE INDEX IF NOT EXISTS book_author_book ON "+DB_TB_BOOK_AUTHOR+" ("+KEY_BOOK+", " + KEY_AUTHOR_ID + ");",
-		"CREATE UNIQUE INDEX IF NOT EXISTS anthology_pk_idx ON " + DB_TB_ANTHOLOGY + " (" + KEY_BOOK + ", " + KEY_AUTHOR_ID + ", " + KEY_TITLE + ");",
-		"CREATE UNIQUE INDEX IF NOT EXISTS search_sources_source ON "+DB_TB_SEARCH_SOURCE+" ("+KEY_SEARCH_SOURCE+")"
+		"CREATE UNIQUE INDEX IF NOT EXISTS anthology_pk_idx ON " + DB_TB_ANTHOLOGY + " (" + KEY_BOOK + ", " + KEY_AUTHOR_ID + ", " + KEY_TITLE + ");"
 		};
 	
 //	private static String AUTHOR_FIELDS = "a." + KEY_ROWID + " as " + KEY_AUTHOR_NAME + ", a." + KEY_FAMILY_NAME + " as " + KEY_FAMILY_NAME 
@@ -375,7 +365,7 @@ public class CatalogueDBAdapter {
 		
 	private final Context mCtx;
 	//TODO: Update database version
-	public static final int DATABASE_VERSION = 62;
+	public static final int DATABASE_VERSION = 61;
 
 	private TableInfo mBooksInfo = null;
 
@@ -406,9 +396,6 @@ public class CatalogueDBAdapter {
 			db.execSQL(DATABASE_CREATE_BOOK_AUTHOR);
 			db.execSQL(DATABASE_CREATE_BOOK_BOOKSHELF_WEAK);
 			db.execSQL(DATABASE_CREATE_BOOK_SERIES);
-			db.execSQL(DATABASE_CREATE_SEARCH_SOURCE);
-			createIndices(db);
-			insertSearchSources(db);
 			
 			new File(Utils.EXTERNAL_FILE_PATH + "/").mkdirs();
 			try {
@@ -1193,30 +1180,7 @@ public class CatalogueDBAdapter {
 					message += "* Fixed crash when opening search results\n\n";
 				}
 			}
-			if (curVersion == 61) {
-				try {
-					Cursor results61 = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='" + DB_TB_SEARCH_SOURCE + "'", new String[]{});
-					if (results61.getCount() == 0) {
-						//table does not exist
-						db.execSQL(DATABASE_CREATE_SEARCH_SOURCE);
-						insertSearchSources(db);
-						createIndices(db);
-					}
-				} catch (Exception e) {
-					Logger.logError(e);
-					throw new RuntimeException("Failed to upgrade database", e);
-				} finally {
-				}
-				curVersion++;
-			}
 			//TODO: NOTE: END OF UPDATE
-		}
-
-		private void insertSearchSources(SQLiteDatabase db) {
-			String[] sources = {"Google", "Amazon", "LibraryThing"};
-			for (String source : sources) {
-				db.execSQL("INSERT OR REPLACE INTO " + DB_TB_SEARCH_SOURCE + "( " + KEY_SEARCH_SOURCE + ") VALUES ('" + source + "')");	
-			}
 		}
 	}
 	
@@ -4006,14 +3970,6 @@ public class CatalogueDBAdapter {
     	return fetchArray(sql, KEY_AUTHOR_FORMATTED);
 	}
 
-	public ArrayList<String> fetchAllSearchSourcesArray() {
-		
-		String sql = "SELECT " + KEY_SEARCH_SOURCE +
-				    " FROM " + DB_TB_SEARCH_SOURCE +
-				    " ORDER BY " + KEY_SEARCH_SOURCE;
-		return fetchArray(sql, KEY_SEARCH_SOURCE);
-	}
-    
     public String encodeString(String value) {
     	return value.replace("'", "''");
     }
