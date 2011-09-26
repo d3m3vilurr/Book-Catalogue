@@ -69,6 +69,8 @@ public class SearchManager implements OnTaskEndedListener {
 	private Bundle mYes24Data;
 	// Output from Aladin search
 	private Bundle mAladinData;
+	// Output from Daum search
+	private Bundle mDaumData;
 
 	// Handler for search results
 	private SearchResultHandler mSearchHandler = null;
@@ -191,6 +193,14 @@ public class SearchManager implements OnTaskEndedListener {
 			if (mIsbn != null && mIsbn.trim().length() > 0)
 				startOne( new SearchAladinThread(mTaskManager, mLibraryThingHandler, mAuthor, mTitle, mIsbn, mFetchThumbnail));		
 	}
+	/**
+	 * Start an Daum search
+	 */
+	private void startDaum(){
+		if (!mCancelledFlg)
+			if (mIsbn != null && mIsbn.trim().length() > 0)
+				startOne( new SearchDaumThread(mTaskManager, mLibraryThingHandler, mAuthor, mTitle, mIsbn, mFetchThumbnail));		
+	}
 	
 	/**
 	 * Start a search
@@ -206,6 +216,8 @@ public class SearchManager implements OnTaskEndedListener {
 		mAmazonData = null;
 		mLibraryThingData = null;
 		mYes24Data = null;
+		mAladinData = null;
+		mDaumData = null;
 		mWaitingForIsbn = false;
 		mCancelledFlg = false;
 		mFinished = false;
@@ -233,13 +245,14 @@ public class SearchManager implements OnTaskEndedListener {
 		// these in series.
 		if (mIsbn != null && mIsbn.length() > 0) {
 			mWaitingForIsbn = false;
-			if (Utils.USE_LT) {
-				startLibraryThing();
-			}
-			startGoogle();
-			startAmazon();
-			startYes24();
-			startAladin();
+//			if (Utils.USE_LT) {
+//				startLibraryThing();
+//			}
+//			startGoogle();
+//			startAmazon();
+//			startYes24();
+//			startAladin();
+			startDaum();
 		} else {
 			// Run one at a time, startNext() defined the order.
 			mWaitingForIsbn = true;
@@ -304,6 +317,7 @@ public class SearchManager implements OnTaskEndedListener {
 		accumulateData(mLibraryThingData);
 		accumulateData(mYes24Data);
 		accumulateData(mAladinData);
+		accumulateData(mDaumData);
 		
     	// If there are thumbnails present, pick the biggest, delete others and rename.
     	Utils.cleanupThumbnails(mBookData);
@@ -367,6 +381,8 @@ public class SearchManager implements OnTaskEndedListener {
 			startYes24();
 		} else if (mAladinData == null) {
 			startAladin();
+		} else if (mDaumData == null) {
+			startDaum();
 		}
 	}
 
@@ -390,6 +406,7 @@ public class SearchManager implements OnTaskEndedListener {
 						startLibraryThing();
 						startYes24();
 						startAladin();
+						startDaum();
 					} else {
 						// Start next one that has not run. 
 						startNext();
@@ -419,6 +436,7 @@ public class SearchManager implements OnTaskEndedListener {
 						startLibraryThing();
 						startYes24();
 						startAladin();
+						startDaum();
 					} else {
 						// Start next one that has not run. 
 						startNext();
@@ -448,6 +466,7 @@ public class SearchManager implements OnTaskEndedListener {
 						startAmazon();
 						startYes24();
 						startAladin();
+						startDaum();
 					} else {
 						// Start next one that has not run. 
 						startNext();
@@ -477,6 +496,7 @@ public class SearchManager implements OnTaskEndedListener {
 						startAmazon();
 						startLibraryThing();
 						startAladin();
+						startDaum();
 					} else {
 						// Start next one that has not run. 
 						startNext();
@@ -506,6 +526,7 @@ public class SearchManager implements OnTaskEndedListener {
 						startAmazon();
 						startLibraryThing();
 						startYes24();
+						startDaum();
 					} else {
 						// Start next one that has not run. 
 						startNext();
@@ -514,5 +535,35 @@ public class SearchManager implements OnTaskEndedListener {
 			}
 		}
 	};
-	
+
+	/**
+	 * Handle Daum completion()
+	 */
+	private SearchTaskHandler mDaumHandler = new SearchTaskHandler() {
+		@Override
+		public void onSearchThreadFinish(SearchThread t, Bundle bookData, boolean cancelled) {
+			mCancelledFlg = cancelled;
+			mAladinData = bookData;
+			if (cancelled) {
+				mWaitingForIsbn = false;
+			} else {
+				if (mWaitingForIsbn) {
+					if (Utils.isNonBlankString(bookData, CatalogueDBAdapter.KEY_ISBN)) {
+						mWaitingForIsbn = false;
+						// Start the other two...even if they have run before
+						mIsbn = bookData.getString(CatalogueDBAdapter.KEY_ISBN);
+						startGoogle();
+						startAmazon();
+						startLibraryThing();
+						startYes24();
+						startAladin();
+					} else {
+						// Start next one that has not run. 
+						startNext();
+					}
+				}
+			}
+		}
+	};
+
 }

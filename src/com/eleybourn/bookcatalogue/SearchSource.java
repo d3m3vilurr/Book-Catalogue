@@ -105,6 +105,9 @@ public class SearchSource extends Activity {
 		for (String key : new String[] {"Amazon", "Google", "LibraryThing"}) {
 			list.add(key);
 		}
+		for (String key : new String[] {"Aladin", "Daum", "Yes24"}) {
+			list.add(key);
+		}
 		return list;
 	}
     
