@@ -42,7 +42,6 @@ import android.widget.TextView;
  * @author Evan Leybourn
  */
 public class SearchSource extends Activity {
-	private CatalogueDBAdapter mDbHelper = new CatalogueDBAdapter(this);
 	public final static String prefix = "search_source_";
 	
 	/**
@@ -53,7 +52,6 @@ public class SearchSource extends Activity {
 		try {
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.search_source);
-			mDbHelper.open();
 			setupSearchSources();
 		} catch (Exception e) {
 			Logger.logError(e);
@@ -65,7 +63,7 @@ public class SearchSource extends Activity {
 	 * to each field checkbox
 	 */
 	public void setupSearchSources() {
-		ArrayList<String> sources = mDbHelper.fetchAllSearchSourcesArray();
+		ArrayList<String> sources = getSearchSourcesArray();
 		SharedPreferences mPrefs = getSharedPreferences("bookCatalogue", MODE_PRIVATE);
 		
 		// Display the list of fields
@@ -102,12 +100,17 @@ public class SearchSource extends Activity {
 		}
 	}
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		mDbHelper.close();
-	} 
-
+	public ArrayList<String> getSearchSourcesArray() {
+		ArrayList<String> list = new ArrayList<String>();
+		for (String key : new String[] {"Amazon", "Google", "LibraryThing"}) {
+			list.add(key);
+		}
+		for (String key : new String[] {"Aladin", "Daum", "Yes24"}) {
+			list.add(key);
+		}
+		return list;
+	}
+    
 	public static boolean getSearchSource(SharedPreferences prefs, String key) {
 		String prefs_name = prefix + key;
 		return prefs.getBoolean(prefs_name, true);
