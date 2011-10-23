@@ -365,7 +365,7 @@ public class CatalogueDBAdapter {
 		
 	private final Context mCtx;
 	//TODO: Update database version
-	public static final int DATABASE_VERSION = 61;
+	public static final int DATABASE_VERSION = 62;
 
 	private TableInfo mBooksInfo = null;
 
@@ -1179,6 +1179,14 @@ public class CatalogueDBAdapter {
 					message += "* Will check for network connection prior to searching for details (new permission required)\n\n";
 					message += "* Fixed crash when opening search results\n\n";
 				}
+				if (curVersion == 61) {
+					curVersion++;
+					message += "New in v3.8\n\n";
+					message += "* Fixed several defects (including multiple author's and author prefix/suffix's)\n\n";
+					message += "* Fixed issue with thumbnail resolutions from LibraryThing\n\n";
+					message += "* Changed the 'Add Book' menu options to be submenu\n\n";
+					message += "* The database backup has been renamed for clarity\n\n";
+				}
 			}
 			//TODO: NOTE: END OF UPDATE
 		}
@@ -1399,6 +1407,12 @@ public class CatalogueDBAdapter {
 				String sname = names[names.length-2];
 				/* e.g. Ursula Le Guin or Marianne De Pierres */
 				if (sname.matches("[LlDd]e")) {
+					family = names[names.length-2] + " ";
+					flen = 2;
+				}
+				sname = names[names.length-1];
+				/* e.g. Foo Bar Jr*/
+				if (sname.matches("[Jj]r|[Jj]unior|[Ss]r|[Ss]enior")) {
 					family = names[names.length-2] + " ";
 					flen = 2;
 				}
@@ -2802,7 +2816,6 @@ public class CatalogueDBAdapter {
 		ArrayList<Author> authors = values.getParcelableArrayList(CatalogueDBAdapter.KEY_AUTHOR_ARRAY);
 		if (authors == null || authors.size() == 0)
 			throw new IllegalArgumentException();
-
 		ContentValues initialValues = filterValues(values, mBooksInfo);
 
 		if (id > 0) {
@@ -3322,8 +3335,6 @@ public class CatalogueDBAdapter {
 			mDeleteBookAuthorsStmt.bindLong(1, bookId);
 			mDeleteBookAuthorsStmt.execute();
 
-			mAddBookAuthorsStmt.bindLong(1, bookId);
-
 			// Get the authors and turn into a list of names
 			Iterator<Author> i = authors.iterator();
 			// The list MAY contain duplicates (eg. from Internet lookups of multiple
@@ -3338,9 +3349,11 @@ public class CatalogueDBAdapter {
 				if (!idHash.containsKey(authorIdStr)) {
 					idHash.put(authorIdStr, true);
 					pos++;
+					mAddBookAuthorsStmt.bindLong(1, bookId);
 					mAddBookAuthorsStmt.bindLong(2, authorId);
 					mAddBookAuthorsStmt.bindLong(3, pos);
 					mAddBookAuthorsStmt.executeInsert();
+					mAddBookAuthorsStmt.clearBindings();
 				}
 			}
 		}
