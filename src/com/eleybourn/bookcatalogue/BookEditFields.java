@@ -139,10 +139,10 @@ public class BookEditFields extends Activity {
 				String publisher = publisher_cur.getString(publisher_cur.getColumnIndexOrThrow(CatalogueDBAdapter.KEY_PUBLISHER));
 				publisher_list.add(publisher);
 			}
-			return publisher_list;
 		} finally {
 			publisher_cur.close();			
 		}
+		return publisher_list;
 	}
 	
 	protected ArrayList<String> getGenres() {
@@ -153,10 +153,10 @@ public class BookEditFields extends Activity {
 				String genre = genre_cur.getString(genre_cur.getColumnIndexOrThrow(CatalogueDBAdapter.KEY_ROWID));
 				genre_list.add(genre);
 			}
-			return genre_list;
 		} finally {
 			genre_cur.close();			
 		}
+		return genre_list;
 	}
 
 	/**

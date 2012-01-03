@@ -41,6 +41,11 @@ Features include;
   case. e.g. "The murder on the links" becomes "Murder on the Links, The"
 * Using ISBN or Barcode scanning will also download a thumbnail (if available)
 
+new in v3.8.1
+* Italian translation added
+* Crash during searching fixed
+* Crash when entering locations fixed
+
 New in v3.8
 * Fixed several defects (including multiple author's and author prefix/suffix's)
 * Fixed issue with thumbnail resolutions from LibraryThing
