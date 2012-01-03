@@ -65,16 +65,22 @@ public class AdministrationLibraryThing extends Activity {
 		SharedPreferences prefs = getSharedPreferences("bookCatalogue", android.content.Context.MODE_PRIVATE);
 		devkeyView.setText(prefs.getString(LibraryThingManager.LT_DEVKEY_PREF_NAME, ""));
 		
+		EditText naverkeyView = (EditText) findViewById(R.id.naver_devkey);
+		naverkeyView.setText(prefs.getString(NaverManager.NAVER_DEVKEY_PREF_NAME, ""));
+		
 		/* Save Button */
 		Button btn = (Button) findViewById(R.id.confirm);
 		btn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				EditText devkeyView = (EditText) findViewById(R.id.devkey);
+				EditText naverkeyView = (EditText) findViewById(R.id.naver_devkey);
 				String devkey = devkeyView.getText().toString();
+				String naverkey = naverkeyView.getText().toString();
 				SharedPreferences prefs = getSharedPreferences("bookCatalogue", android.content.Context.MODE_PRIVATE);
 				SharedPreferences.Editor ed = prefs.edit();
 				ed.putString(LibraryThingManager.LT_DEVKEY_PREF_NAME, devkey);
+				ed.putString(NaverManager.NAVER_DEVKEY_PREF_NAME, naverkey);
 				ed.commit();
 				
 				if (devkey.length() > 0) {

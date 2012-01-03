@@ -71,6 +71,8 @@ public class SearchManager implements OnTaskEndedListener {
 	private Bundle mAladinData;
 	// Output from Daum search
 	private Bundle mDaumData;
+	// Output from Naver search
+	private Bundle mNaverData;
 
 	// Handler for search results
 	private SearchResultHandler mSearchHandler = null;
@@ -127,6 +129,10 @@ public class SearchManager implements OnTaskEndedListener {
 			return mYes24Handler;
 		} else if (t instanceof SearchAladinThread) {
 			return mAladinHandler;
+		} else if (t instanceof SearchDaumThread) {
+			return mDaumHandler;
+		} else if (t instanceof SearchNaverThread) {
+			return mNaverHandler;
 		} else {
 			return null;
 		}
@@ -201,7 +207,14 @@ public class SearchManager implements OnTaskEndedListener {
 			if (mIsbn != null && mIsbn.trim().length() > 0)
 				startOne( new SearchDaumThread(mTaskManager, mLibraryThingHandler, mAuthor, mTitle, mIsbn, mFetchThumbnail));		
 	}
-	
+	/**
+	 * Start an Naver search
+	 */
+	private void startNaver(){
+		if (!mCancelledFlg)
+			if (mIsbn != null && mIsbn.trim().length() > 0)
+				startOne( new SearchNaverThread(mTaskManager, mLibraryThingHandler, mAuthor, mTitle, mIsbn, mFetchThumbnail));		
+	}	
 	/**
 	 * Start a search
 	 * 
@@ -218,6 +231,7 @@ public class SearchManager implements OnTaskEndedListener {
 		mYes24Data = null;
 		mAladinData = null;
 		mDaumData = null;
+		mNaverData = null;
 		mWaitingForIsbn = false;
 		mCancelledFlg = false;
 		mFinished = false;
@@ -253,6 +267,7 @@ public class SearchManager implements OnTaskEndedListener {
 			startYes24();
 			startAladin();
 			startDaum();
+			startNaver();
 		} else {
 			// Run one at a time, startNext() defined the order.
 			mWaitingForIsbn = true;
@@ -318,6 +333,7 @@ public class SearchManager implements OnTaskEndedListener {
 		accumulateData(mYes24Data);
 		accumulateData(mAladinData);
 		accumulateData(mDaumData);
+		accumulateData(mNaverData);
 		
 		// If there are thumbnails present, pick the biggest, delete others and rename.
 		Utils.cleanupThumbnails(mBookData);
@@ -386,6 +402,8 @@ public class SearchManager implements OnTaskEndedListener {
 			startAladin();
 		} else if (mDaumData == null) {
 			startDaum();
+		} else if (mNaverData == null) {
+			startNaver();
 		}
 	}
 
@@ -440,6 +458,7 @@ public class SearchManager implements OnTaskEndedListener {
 						startYes24();
 						startAladin();
 						startDaum();
+						startNaver();
 					} else {
 						// Start next one that has not run. 
 						startNext();
@@ -470,6 +489,7 @@ public class SearchManager implements OnTaskEndedListener {
 						startYes24();
 						startAladin();
 						startDaum();
+						startNaver();
 					} else {
 						// Start next one that has not run. 
 						startNext();
@@ -500,6 +520,7 @@ public class SearchManager implements OnTaskEndedListener {
 						startLibraryThing();
 						startAladin();
 						startDaum();
+						startNaver();
 					} else {
 						// Start next one that has not run. 
 						startNext();
@@ -530,6 +551,7 @@ public class SearchManager implements OnTaskEndedListener {
 						startLibraryThing();
 						startYes24();
 						startDaum();
+						startNaver();
 					} else {
 						// Start next one that has not run. 
 						startNext();
@@ -546,7 +568,7 @@ public class SearchManager implements OnTaskEndedListener {
 		@Override
 		public void onSearchThreadFinish(SearchThread t, Bundle bookData, boolean cancelled) {
 			mCancelledFlg = cancelled;
-			mAladinData = bookData;
+			mDaumData = bookData;
 			if (cancelled) {
 				mWaitingForIsbn = false;
 			} else {
@@ -560,6 +582,38 @@ public class SearchManager implements OnTaskEndedListener {
 						startLibraryThing();
 						startYes24();
 						startAladin();
+						startNaver();
+					} else {
+						// Start next one that has not run. 
+						startNext();
+					}
+				}
+			}
+		}
+	};
+	
+	/**
+	 * Handle Naver completion()
+	 */
+	private SearchTaskHandler mNaverHandler = new SearchTaskHandler() {
+		@Override
+		public void onSearchThreadFinish(SearchThread t, Bundle bookData, boolean cancelled) {
+			mCancelledFlg = cancelled;
+			mNaverData = bookData;
+			if (cancelled) {
+				mWaitingForIsbn = false;
+			} else {
+				if (mWaitingForIsbn) {
+					if (Utils.isNonBlankString(bookData, CatalogueDBAdapter.KEY_ISBN)) {
+						mWaitingForIsbn = false;
+						// Start the other two...even if they have run before
+						mIsbn = bookData.getString(CatalogueDBAdapter.KEY_ISBN);
+						startGoogle();
+						startAmazon();
+						startLibraryThing();
+						startYes24();
+						startAladin();
+						startDaum();
 					} else {
 						// Start next one that has not run. 
 						startNext();
